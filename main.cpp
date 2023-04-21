@@ -10,7 +10,8 @@
 #include <QSet>
 #include <QMap>
 #include <cmath>
-
+#include <random>
+#include <QDebug>
 enum class Margin
 {
     Left             = 0,
@@ -67,12 +68,20 @@ int main(int argc, char *argv[])
         int de = nodeInd/(numElements/N);
 
         QSet<int> uniqueCircuits;
+        std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+        std::normal_distribution<double> distribution(circCount/2, circCount/6); // задаем параметры нормального распределения
+
         for(int portInd=0; portInd < portsNum; ++portInd)
         {
-            circInd = rand()%circCount;
+            double circIndDouble = distribution(generator); // генерируем индекс цепи по нормальному распределению
+            int circInd = qBound(0, static_cast<int>(std::round(circIndDouble)), circCount-1); // округляем и ограничиваем индекс в диапазоне [0, circCount-1]
+
+            qDebug() << circInd;
+
             while(uniqueCircuits.contains(circInd))
             {
-                circInd = rand()%circCount;
+                circIndDouble = distribution(generator);
+                circInd = qBound(0, static_cast<int>(std::round(circIndDouble)), circCount-1);
             }
             uniqueCircuits.insert(circInd);
 
